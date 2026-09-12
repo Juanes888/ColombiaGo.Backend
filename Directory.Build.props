@@ -1,0 +1,18 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    Warnings-as-errors is opt-in per project (not solution-wide) so that generated/scaffolding
+    code (migrations, obj/) never blocks a build. Projects that want strict enforcement set
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors> in their own .csproj.
+  -->
+
+</Project>
