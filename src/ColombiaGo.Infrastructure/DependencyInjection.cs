@@ -1,5 +1,7 @@
 using ColombiaGo.Application.Abstractions;
+using ColombiaGo.Domain.Enums;
 using ColombiaGo.Infrastructure.Auth;
+using ColombiaGo.Infrastructure.Ia;
 using ColombiaGo.Infrastructure.Persistence;
 using ColombiaGo.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication;
@@ -24,8 +26,19 @@ public static class DependencyInjection
                 "Missing connection string 'ColombiaGoDb'. Set it via User Secrets or the " +
                 "ConnectionStrings__ColombiaGoDb environment variable.");
 
+        // MapEnum (not just HasPostgresEnum in the model) is what makes Npgsql send these as the
+        // native Postgres enum types; without it EF falls back to int and every comparison like
+        // `estado_publicacion = 1` fails with 42883. Names must match db/001_schema.sql.
         services.AddDbContext<ColombiaGoDbContext>(options => options
-            .UseNpgsql(connectionString)
+            .UseNpgsql(connectionString, npgsql => npgsql
+                .MapEnum<RangoPrecio>("rango_precio")
+                .MapEnum<EstadoPublicacion>("estado_publicacion")
+                .MapEnum<EstadoModeracion>("estado_moderacion")
+                .MapEnum<EstadoEvento>("estado_evento")
+                .MapEnum<TipoInteraccion>("tipo_interaccion")
+                .MapEnum<TipoDato>("tipo_dato")
+                .MapEnum<TipoReporte>("tipo_reporte")
+                .MapEnum<FormatoSalida>("formato_salida"))
             .UseSnakeCaseNamingConvention());
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -35,6 +48,9 @@ public static class DependencyInjection
 
         services.Configure<ModeracionOptions>(configuration.GetSection(ModeracionOptions.SectionName));
         services.AddSingleton<IModeracionSettings, ModeracionSettings>();
+
+        services.Configure<GeminiOptions>(configuration.GetSection(GeminiOptions.SectionName));
+        services.AddHttpClient<IGeminiClient, GeminiClient>();
 
         services.AddScoped<UsuarioProvisioner>();
         services.AddScoped<IClaimsTransformation, RolClaimsTransformation>();

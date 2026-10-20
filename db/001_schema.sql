@@ -438,7 +438,7 @@ begin
 
     return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 drop trigger if exists trg_auth_handle_new_user on auth.users;
 create trigger trg_auth_handle_new_user

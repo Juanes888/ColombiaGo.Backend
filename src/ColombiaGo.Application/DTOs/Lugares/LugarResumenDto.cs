@@ -15,4 +15,6 @@ public sealed record LugarResumenDto(
     string Category,         // category slug
     string CategoryLabel,
     string? Image,
-    string? Tagline);
+    string? Tagline,
+    decimal Latitude,
+    decimal Longitude);

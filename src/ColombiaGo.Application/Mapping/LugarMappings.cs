@@ -22,7 +22,9 @@ public static class LugarMappings
         Category: lugar.Categoria.Slug,
         CategoryLabel: lugar.Categoria.Nombre,
         Image: lugar.ImagenPortadaUrl,
-        Tagline: lugar.Eslogan);
+        Tagline: lugar.Eslogan,
+        Latitude: lugar.Latitud,
+        Longitude: lugar.Longitud);
 
     public static LugarDetalleDto ToDetalleDto(this Lugar lugar, bool isFavorite, bool isInRoute)
     {
