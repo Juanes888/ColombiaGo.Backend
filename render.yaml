@@ -5,7 +5,7 @@ services:
     name: colombiago-api
     runtime: docker
     region: ohio
-    plan: free # el plan free se "duerme" tras 15 min sin uso (la 1.ª petición tarda ~30-60 s); "starter" (7 USD/mes) no se duerme
+    plan: starter # 7 USD/mes: no se duerme (el plan "free" se apaga tras 15 min sin uso y la 1.ª petición tarda ~30-60 s)
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     envVars:

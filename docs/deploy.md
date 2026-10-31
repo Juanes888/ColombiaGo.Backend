@@ -16,7 +16,7 @@ Con la API en internet, la app ya no depende de que tu computador esté encendid
    `Supabase__Url` y `ASPNETCORE_ENVIRONMENT` ya vienen en el blueprint.
 4. Espera el primer despliegue y abre `https://<tu-servicio>.onrender.com/health`: debe decir **Healthy**.
 
-> **Plan gratis:** Render apaga el servicio tras 15 minutos sin tráfico y la primera petición después tarda 30-60 s en
+> **Plan gratis (cámbialo en `render.yaml` a `plan: free`):** Render apaga el servicio tras 15 minutos sin tráfico y la primera petición después tarda 30-60 s en
 > despertarlo. Para una demo o para usuarios reales conviene el plan *Starter* (7 USD/mes), que no se duerme.
 
 Otras opciones equivalentes (usan el mismo `Dockerfile`): Railway, Fly.io, Google Cloud Run, Azure Container Apps.
