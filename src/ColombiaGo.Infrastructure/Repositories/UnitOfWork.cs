@@ -27,6 +27,8 @@ public class UnitOfWork : IUnitOfWork
         Reportes = new ReporteGeneradoRepository(context);
         HistorialInteracciones = new HistorialInteraccionRepository(context);
         UsuarioPreferencias = new UsuarioPreferenciaRepository(context);
+        LugarTraducciones = new LugarTraduccionRepository(context);
+        GuiasViaje = new GuiaViajeRepository(context);
     }
 
     public ILugarRepository Lugares { get; }
@@ -45,6 +47,8 @@ public class UnitOfWork : IUnitOfWork
     public IReporteGeneradoRepository Reportes { get; }
     public IHistorialInteraccionRepository HistorialInteracciones { get; }
     public IUsuarioPreferenciaRepository UsuarioPreferencias { get; }
+    public ILugarTraduccionRepository LugarTraducciones { get; }
+    public IGuiaViajeRepository GuiasViaje { get; }
 
     public Task<int> SaveChangesAsync(CancellationToken ct = default) => _context.SaveChangesAsync(ct);
 }

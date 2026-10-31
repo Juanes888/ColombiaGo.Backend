@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ColombiaGo.Application.Abstractions;
+using ColombiaGo.Application.Common;
 using ColombiaGo.Application.DTOs.Rutas;
 using ColombiaGo.Application.Mapping;
 using ColombiaGo.Domain.Common;
@@ -16,11 +17,13 @@ public sealed class RutaIaService : IRutaIaService
 
     private readonly IUnitOfWork _uow;
     private readonly IGeminiClient _gemini;
+    private readonly ILugarLocalizador _localizador;
 
-    public RutaIaService(IUnitOfWork uow, IGeminiClient gemini)
+    public RutaIaService(IUnitOfWork uow, IGeminiClient gemini, ILugarLocalizador localizador)
     {
         _uow = uow;
         _gemini = gemini;
+        _localizador = localizador;
     }
 
     public async Task<Result<RutaIaDto>> GenerarConIaAsync(GenerarRutaIaRequest request, CancellationToken ct = default)
@@ -43,7 +46,7 @@ public sealed class RutaIaService : IRutaIaService
         string? json;
         try
         {
-            json = await _gemini.GenerarJsonAsync(ConstruirPrompt(lugares, request.Presupuesto), ct);
+            json = await _gemini.GenerarJsonAsync(ConstruirPrompt(lugares, request.Presupuesto, _localizador.Idioma), ct);
         }
         catch (Exception ex)
         {
@@ -57,10 +60,12 @@ public sealed class RutaIaService : IRutaIaService
                 Error.Unexpected("RutaIa.RespuestaInvalida", "La IA no devolvió una ruta válida. Intenta de nuevo."));
 
         var porSlug = lugares.ToDictionary(l => l.Slug);
-        var paradas = plan.OrdenSlugs
+        var ordenados = plan.OrdenSlugs
             .Where(porSlug.ContainsKey)
-            .Select(slug => porSlug[slug].ToResumenDto())
+            .Distinct()
+            .Select(slug => porSlug[slug])
             .ToList();
+        var paradas = await _localizador.ResumenAsync(ordenados, ct);
 
         if (paradas.Count == 0)
             return Result<RutaIaDto>.Failure(
@@ -69,7 +74,7 @@ public sealed class RutaIaService : IRutaIaService
         return Result<RutaIaDto>.Success(new RutaIaDto(paradas, plan.CostoEstimado, plan.Explicacion));
     }
 
-    private static string ConstruirPrompt(IReadOnlyList<Lugar> lugares, decimal presupuesto)
+    private static string ConstruirPrompt(IReadOnlyList<Lugar> lugares, decimal presupuesto, string idioma)
     {
         var lineas = lugares.Select(l =>
             $"- slug: \"{l.Slug}\" | {l.Nombre} ({l.Ciudad}, {l.Categoria.Nombre}) | costo aproximado: {CostoTexto(l)} | {l.Eslogan}");
@@ -83,7 +88,7 @@ public sealed class RutaIaService : IRutaIaService
             Elige el subconjunto y el orden de visita que mejor aproveche el presupuesto (puedes dejar
             fuera lugares si no caben todos). Responde ÚNICAMENTE con JSON válido, sin texto adicional
             ni markdown, con esta forma exacta:
-            {"ordenSlugs": ["slug1", "slug2"], "costoEstimado": 123000, "explicacion": "una frase breve en español explicando la elección"}
+            {"ordenSlugs": ["slug1", "slug2"], "costoEstimado": 123000, "explicacion": "one short sentence in {{Idiomas.NombreParaPrompt(idioma)}} explaining the choice"}
             Usa solo los slugs de la lista de arriba, en el orden sugerido de visita.
             """;
     }

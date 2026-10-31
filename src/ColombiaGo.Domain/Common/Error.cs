@@ -36,6 +36,8 @@ public sealed class Error : IEquatable<Error>
 
     public static Error Unauthorized(string code, string message) => new(code, message, ErrorType.Unauthorized);
 
+    public static Error TooManyRequests(string code, string message) => new(code, message, ErrorType.TooManyRequests);
+
     public static Error Unexpected(string code, string message) => new(code, message, ErrorType.Unexpected);
 
     public bool Equals(Error? other) =>
@@ -56,5 +58,6 @@ public enum ErrorType
     Conflict,
     Forbidden,
     Unauthorized,
+    TooManyRequests,
     Unexpected,
 }

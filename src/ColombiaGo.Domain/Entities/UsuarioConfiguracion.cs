@@ -18,6 +18,12 @@ public class UsuarioConfiguracion : Entity<Guid>
     public bool Ubicacion { get; set; } = true;
     public bool ReduceMotion { get; set; }
 
+    /// <summary>Idioma de la app elegido por la persona: es, en, pt, zh o fr.</summary>
+    public string Idioma { get; set; } = "es";
+
+    /// <summary>False hasta que termina (o salta) el recorrido de bienvenida.</summary>
+    public bool OnboardingCompletado { get; set; }
+
     public DateTimeOffset FechaActualizacion { get; set; }
 
     /// <summary>For EF Core materialization only.</summary>

@@ -12,24 +12,26 @@ public sealed class LugarService : ILugarService
 {
     private readonly IUnitOfWork _uow;
     private readonly ICurrentUser _currentUser;
+    private readonly ILugarLocalizador _localizador;
 
-    public LugarService(IUnitOfWork uow, ICurrentUser currentUser)
+    public LugarService(IUnitOfWork uow, ICurrentUser currentUser, ILugarLocalizador localizador)
     {
         _uow = uow;
         _currentUser = currentUser;
+        _localizador = localizador;
     }
 
     public async Task<PagedResult<LugarResumenDto>> BuscarAsync(LugarQueryParams query, CancellationToken ct = default)
     {
         var page = await _uow.Lugares.SearchAsync(query, ct);
-        var items = page.Items.Select(l => l.ToResumenDto()).ToList();
+        var items = await _localizador.ResumenAsync(page.Items.ToList(), ct);
         return new PagedResult<LugarResumenDto>(items, page.Page, page.PageSize, page.TotalCount);
     }
 
     public async Task<IReadOnlyList<LugarResumenDto>> GetDestacadosAsync(int take, CancellationToken ct = default)
     {
         var lugares = await _uow.Lugares.GetDestacadosAsync(take, ct);
-        return lugares.Select(l => l.ToResumenDto()).ToList();
+        return await _localizador.ResumenAsync(lugares.ToList(), ct);
     }
 
     public async Task<Result<LugarDetalleDto>> GetPorSlugAsync(string slug, CancellationToken ct = default)
@@ -53,7 +55,7 @@ public sealed class LugarService : ILugarService
             await RegistrarVistaAsync(userId, lugar.Id, ct);
         }
 
-        return Result<LugarDetalleDto>.Success(lugar.ToDetalleDto(isFavorite, isInRoute));
+        return Result<LugarDetalleDto>.Success(await _localizador.DetalleAsync(lugar, isFavorite, isInRoute, ct));
     }
 
     private async Task RegistrarVistaAsync(Guid usuarioId, int lugarId, CancellationToken ct)

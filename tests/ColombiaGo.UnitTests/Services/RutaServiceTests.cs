@@ -18,7 +18,7 @@ public class RutaServiceTests
         var categoria = context.AddCategoria();
         context.AddLugar(categoria, "comuna-13");
 
-        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
 
         await service.AgregarParadaAsync("comuna-13");
         var result = await service.AgregarParadaAsync("comuna-13");
@@ -33,7 +33,7 @@ public class RutaServiceTests
         var rol = context.AddRol();
         var usuario = context.AddUsuario(rol);
 
-        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
 
         var result = await service.GetMisParadasAsync();
 
@@ -50,7 +50,7 @@ public class RutaServiceTests
         var categoria = context.AddCategoria();
         context.AddLugar(categoria, "comuna-13");
 
-        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
         await service.AgregarParadaAsync("comuna-13");
 
         var result = await service.QuitarParadaAsync("comuna-13");
@@ -66,7 +66,7 @@ public class RutaServiceTests
         var rol = context.AddRol();
         var usuario = context.AddUsuario(rol);
 
-        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
 
         var result = await service.GenerarAsync();
 
@@ -84,7 +84,7 @@ public class RutaServiceTests
         context.AddLugar(categoria, "comuna-13", latitud: 6.0m, longitud: -75.0m);
         context.AddLugar(categoria, "guatape", latitud: 6.23m, longitud: -75.16m);
 
-        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
         await service.AgregarParadaAsync("comuna-13");
         await service.AgregarParadaAsync("guatape");
 
@@ -107,7 +107,7 @@ public class RutaServiceTests
         context.AddLugar(categoria, "comuna-13");
         context.AddLugar(categoria, "guatape");
 
-        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
         await service.AgregarParadaAsync("comuna-13");
         await service.GenerarAsync();
 

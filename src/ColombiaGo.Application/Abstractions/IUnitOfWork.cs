@@ -23,6 +23,8 @@ public interface IUnitOfWork
     IReporteGeneradoRepository Reportes { get; }
     IHistorialInteraccionRepository HistorialInteracciones { get; }
     IUsuarioPreferenciaRepository UsuarioPreferencias { get; }
+    ILugarTraduccionRepository LugarTraducciones { get; }
+    IGuiaViajeRepository GuiasViaje { get; }
 
     Task<int> SaveChangesAsync(CancellationToken ct = default);
 }

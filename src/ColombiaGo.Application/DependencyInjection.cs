@@ -17,6 +17,8 @@ public static class DependencyInjection
         services.AddScoped<IFavoritoService, FavoritoService>();
         services.AddScoped<IRutaService, RutaService>();
         services.AddScoped<IRutaIaService, RutaIaService>();
+        services.AddScoped<IGuiaViajeIaService, GuiaViajeIaService>();
+        services.AddScoped<ILugarLocalizador, LugarLocalizador>();
         services.AddScoped<ICalificacionService, CalificacionService>();
         services.AddScoped<IEventoService, EventoService>();
         services.AddScoped<IGuiaService, GuiaService>();

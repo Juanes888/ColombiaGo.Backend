@@ -17,7 +17,7 @@ public class FavoritoServiceTests
         var categoria = context.AddCategoria();
         context.AddLugar(categoria, "comuna-13");
 
-        var service = new FavoritoService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new FavoritoService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
 
         var first = await service.AgregarLugarAsync("comuna-13");
         var second = await service.AgregarLugarAsync("comuna-13");
@@ -36,7 +36,7 @@ public class FavoritoServiceTests
         var categoria = context.AddCategoria();
         context.AddLugar(categoria, "comuna-13");
 
-        var service = new FavoritoService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new FavoritoService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
 
         var result = await service.QuitarLugarAsync("comuna-13");
 
@@ -53,7 +53,7 @@ public class FavoritoServiceTests
         var categoria = context.AddCategoria();
         context.AddLugar(categoria, "comuna-13");
 
-        var service = new FavoritoService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new FavoritoService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
 
         await service.AgregarLugarAsync("comuna-13");
         var afterRemove = await service.QuitarLugarAsync("comuna-13");
@@ -69,7 +69,7 @@ public class FavoritoServiceTests
         var rol = context.AddRol();
         var usuario = context.AddUsuario(rol);
 
-        var service = new FavoritoService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id));
+        var service = new FavoritoService(new UnitOfWork(context), new FakeCurrentUser(usuario.Id), TestServices.Localizador(context));
 
         var result = await service.AgregarLugarAsync("no-existe");
 

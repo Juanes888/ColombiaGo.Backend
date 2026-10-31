@@ -22,7 +22,7 @@ public static class PerfilMappings
     }
 
     public static ConfiguracionDto ToDto(this UsuarioConfiguracion config) =>
-        new(config.Notificaciones, config.Ubicacion, config.ReduceMotion);
+        new(config.Notificaciones, config.Ubicacion, config.ReduceMotion, config.Idioma, config.OnboardingCompletado);
 
     public static LogroDto ToLogroDto(this Logro logro, bool unlocked, DateTimeOffset? unlockedAt) =>
         new(logro.Id, logro.Titulo, logro.Descripcion, logro.Tono, logro.Icono, unlocked, unlockedAt);

@@ -15,6 +15,16 @@ public interface ILugarRepository : IRepository<Lugar, int>
 
     Task<PagedResult<Lugar>> SearchAsync(LugarQueryParams query, CancellationToken ct = default);
 
+    /// <summary>Lugares aprobados de una ciudad (coincidencia parcial: incluye "A 2h de Medellín"), opcionalmente
+    /// limitados a categorías, mejor calificados primero. Candidatos reales para la guía de viaje con IA.</summary>
+    Task<IReadOnlyList<Lugar>> GetPorCiudadAsync(
+        string ciudad, IReadOnlyCollection<string>? categoriaSlugs, int take, CancellationToken ct = default);
+
+    Task<IReadOnlyList<Lugar>> GetBySlugsAsync(IReadOnlyCollection<string> slugs, CancellationToken ct = default);
+
+    /// <summary>Ciudades que tienen al menos un lugar aprobado, con su cantidad de lugares.</summary>
+    Task<IReadOnlyList<(string Ciudad, int Total)>> GetCiudadesAsync(CancellationToken ct = default);
+
     Task<IReadOnlyList<Lugar>> GetDestacadosAsync(int take, CancellationToken ct = default);
 
     /// <summary>Highest-rated approved places, optionally restricted to a set of categories —

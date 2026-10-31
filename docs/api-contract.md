@@ -137,3 +137,52 @@ gallery[], features[], attributes[], isFavorite, isInRoute`.
 7. **Enums nativos de PostgreSQL** en vez de columnas enteras — mapeados vía
    `Npgsql.HasPostgresEnum<TEnum>()`, con las mismas etiquetas en snake_case que genera Npgsql
    por defecto (`EstadoEvento.EnCurso` → `'en_curso'`). Ver comentarios en `db/001_schema.sql`.
+
+---
+
+## Idiomas, onboarding y guía de viaje con IA
+
+### Idioma de la petición
+Todo endpoint responde en el idioma de la cabecera `Accept-Language` (`es`, `en`, `pt`, `zh`, `fr`; admite
+`zh-CN`, `pt-BR`…, respeta `q=`; si no coincide ninguno → `es`). Qué cambia según el idioma:
+
+| Qué | Cómo |
+|---|---|
+| Nombre, descripción, eslogan, "cómo llegar" y horario de cada lugar | Traducción con IA **cacheada** en `lugar_traducciones`: la primera petición de un lugar en un idioma lo traduce y lo guarda; las siguientes salen de la base. Si la IA no está disponible, cae a español. |
+| `price`, `reviewsLabel`, precio por hora de guías | Textos fijos traducidos (`DisplayFormatting`); el dinero siempre va en pesos con separadores colombianos (`$15.000`). |
+| Guía de viaje y ruta con IA | La IA escribe en el idioma pedido. |
+| `categoryLabel`, mensajes de error | Quedan en español: el cliente traduce por `category` (slug) y por el código del error (`title` del ProblemDetails, p. ej. `Lugar.NotFound`). |
+
+`POST /api/v1/admin/traducciones/precalentar` (🔒admin) traduce y cachea todos los lugares a en/pt/zh/fr para que
+nadie espere la traducción la primera vez.
+
+### Perfil / onboarding
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET/PUT | `/perfil/configuracion` | Ahora incluye `language` (`es\|en\|pt\|zh\|fr`) y `onboardingCompleted`. El PUT acepta ambos como opcionales: un cliente viejo que solo envía los 3 toggles no pisa el idioma. |
+| POST | `/perfil/onboarding/completar` | Marca el recorrido de bienvenida como terminado/saltado. |
+| GET/PUT | `/perfil/preferencias` | Intereses (`food, culture, nature, nightlife`, máx. 4). Alimentan recomendaciones y la guía con IA. |
+
+### Guía de viaje con IA 🔒
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/ia/ciudades` | Ciudades con lugares disponibles (selector). |
+| POST | `/ia/guia-viaje` | Body `{ ciudad, dias (1-14), presupuesto (COP), intereses[] }`. Devuelve la guía completa y la guarda (201). |
+| GET | `/ia/guias-viaje` | Mis guías (resumen). |
+| GET | `/ia/guias-viaje/{id}` | Una guía (solo si es mía; ajena = 404). |
+
+La IA **solo puede elegir lugares reales de la base**: se descartan slugs inventados o repetidos, se renumeran los días
+y el costo total se recalcula sumando las paradas (no se confía en la suma de la IA). `excedePresupuesto` avisa si no
+alcanzó. Los lugares "A 2h de …" (p. ej. Guatapé desde Medellín) se tratan como excursiones de un día.
+Errores: `GuiaIa.SinApiKey` (500, falta `Gemini:ApiKey`), `GuiaIa.CiudadSinLugares` (400), `GuiaIa.RespuestaInvalida` (500),
+`GuiaIa.LimiteAlcanzado` (**429**, máx. 10 guías por hora y por persona — la IA cuesta dinero).
+
+Respuesta (resumida):
+```jsonc
+{ "id": 7, "ciudad": "Medellín", "dias": 3, "presupuesto": 800000, "idioma": "es",
+  "titulo": "Medellín en 3 días", "resumen": "…",
+  "planDiario": [ { "dia": 1, "tema": "Arte y memoria", "paradas": [
+      { "lugar": { /* LugarResumenDto */ }, "hora": "09:00", "duracionMin": 120, "costoAprox": 30000, "consejo": "…" } ] } ],
+  "costoTotalEstimado": 420000, "presupuestoRestante": 380000, "excedePresupuesto": false,
+  "consejosGenerales": ["…"], "queLlevar": ["…"] }
+```

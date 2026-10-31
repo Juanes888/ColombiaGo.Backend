@@ -64,6 +64,44 @@ public class LugarRepository : Repository<Lugar, int>, ILugarRepository
         return new PagedResult<Lugar>(items, query.Page, query.PageSize, totalCount);
     }
 
+    // ToLower()/Contains sin cultura: EF las traduce a lower(...) LIKE '%...%' en Postgres y también corren en
+    // el proveedor InMemory de los tests (EF.Functions.ILike solo existe en Npgsql).
+#pragma warning disable CA1304, CA1311, CA1862
+    public async Task<IReadOnlyList<Lugar>> GetPorCiudadAsync(
+        string ciudad, IReadOnlyCollection<string>? categoriaSlugs, int take, CancellationToken ct = default)
+    {
+        var buscada = ciudad.ToLower();
+        var filtered = Set
+            .Include(l => l.Categoria)
+            .Where(l => l.EstadoPublicacion == EstadoPublicacion.Aprobado && l.Ciudad.ToLower().Contains(buscada));
+
+        if (categoriaSlugs is { Count: > 0 })
+            filtered = filtered.Where(l => categoriaSlugs.Contains(l.Categoria.Slug));
+
+        return await filtered
+            .OrderByDescending(l => l.CalificacionPromedio)
+            .ThenBy(l => l.Nombre)
+            .Take(take)
+            .ToListAsync(ct);
+    }
+
+#pragma warning restore CA1304, CA1311, CA1862
+
+    public async Task<IReadOnlyList<Lugar>> GetBySlugsAsync(IReadOnlyCollection<string> slugs, CancellationToken ct = default) =>
+        await Set.Include(l => l.Categoria).Where(l => slugs.Contains(l.Slug)).ToListAsync(ct);
+
+    public async Task<IReadOnlyList<(string Ciudad, int Total)>> GetCiudadesAsync(CancellationToken ct = default)
+    {
+        var filas = await Set
+            .Where(l => l.EstadoPublicacion == EstadoPublicacion.Aprobado)
+            .GroupBy(l => l.Ciudad)
+            .Select(g => new { Ciudad = g.Key, Total = g.Count() })
+            .OrderByDescending(x => x.Total)
+            .ThenBy(x => x.Ciudad)
+            .ToListAsync(ct);
+        return filas.Select(f => (f.Ciudad, f.Total)).ToList();
+    }
+
     public async Task<IReadOnlyList<Lugar>> GetDestacadosAsync(int take, CancellationToken ct = default) =>
         await Set
             .Include(l => l.Categoria)

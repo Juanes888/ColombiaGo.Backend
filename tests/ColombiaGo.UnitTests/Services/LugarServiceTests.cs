@@ -124,6 +124,6 @@ public class LugarServiceTests
     {
         var uow = new UnitOfWork(context);
         var currentUser = new FakeCurrentUser(userId);
-        return new LugarService(uow, currentUser);
+        return new LugarService(uow, currentUser, TestServices.Localizador(context));
     }
 }

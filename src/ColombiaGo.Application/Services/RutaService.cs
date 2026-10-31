@@ -15,18 +15,20 @@ public sealed class RutaService : IRutaService
 
     private readonly IUnitOfWork _uow;
     private readonly ICurrentUser _currentUser;
+    private readonly ILugarLocalizador _localizador;
 
-    public RutaService(IUnitOfWork uow, ICurrentUser currentUser)
+    public RutaService(IUnitOfWork uow, ICurrentUser currentUser, ILugarLocalizador localizador)
     {
         _uow = uow;
         _currentUser = currentUser;
+        _localizador = localizador;
     }
 
     public async Task<RutaDto> GetMisParadasAsync(CancellationToken ct = default)
     {
         var userId = _currentUser.RequireUserId();
         var draft = await _uow.Rutas.GetDraftWithParadasAsync(userId, ct);
-        return draft?.ToDto() ?? EmptyRutaDto();
+        return draft is null ? EmptyRutaDto() : await ToRutaDtoAsync(draft, ct);
     }
 
     public async Task<Result<RutaDto>> AgregarParadaAsync(string lugarSlug, CancellationToken ct = default)
@@ -51,7 +53,7 @@ public sealed class RutaService : IRutaService
         }
 
         await _uow.SaveChangesAsync(ct);
-        return Result<RutaDto>.Success(draft.ToDto());
+        return Result<RutaDto>.Success(await ToRutaDtoAsync(draft, ct));
     }
 
     public async Task<Result<RutaDto>> QuitarParadaAsync(string lugarSlug, CancellationToken ct = default)
@@ -74,7 +76,7 @@ public sealed class RutaService : IRutaService
             _uow.Rutas.Remove(draft);
 
         await _uow.SaveChangesAsync(ct);
-        return Result<RutaDto>.Success(draft.Paradas.Count == 0 ? EmptyRutaDto() : draft.ToDto());
+        return Result<RutaDto>.Success(draft.Paradas.Count == 0 ? EmptyRutaDto() : await ToRutaDtoAsync(draft, ct));
     }
 
     public async Task<Result<RutaDto>> GenerarAsync(CancellationToken ct = default)
@@ -93,7 +95,7 @@ public sealed class RutaService : IRutaService
         draft.TiempoEstimadoMin = draft.Paradas.Count * MinutosPorParada;
 
         await _uow.SaveChangesAsync(ct);
-        return Result<RutaDto>.Success(draft.ToDto());
+        return Result<RutaDto>.Success(await ToRutaDtoAsync(draft, ct));
     }
 
     /// <summary>Greedy nearest-neighbor ordering over (latitud, longitud) treated as a flat plane
@@ -123,6 +125,13 @@ public sealed class RutaService : IRutaService
         var dLat = (double)(a.Latitud - b.Latitud);
         var dLng = (double)(a.Longitud - b.Longitud);
         return Math.Sqrt(dLat * dLat + dLng * dLng);
+    }
+
+    private async Task<RutaDto> ToRutaDtoAsync(Ruta ruta, CancellationToken ct)
+    {
+        var lugares = ruta.Paradas.OrderBy(p => p.OrdenOptimo).Select(p => p.Lugar).ToList();
+        var paradas = await _localizador.ResumenAsync(lugares, ct);
+        return new RutaDto(ruta.Id, ruta.FechaGeneracion is not null, ruta.FechaGeneracion, ruta.TiempoEstimadoMin, paradas);
     }
 
     private static RutaDto EmptyRutaDto() => new(0, false, null, null, Array.Empty<Application.DTOs.Lugares.LugarResumenDto>());

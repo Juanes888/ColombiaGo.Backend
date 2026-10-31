@@ -6,7 +6,7 @@ namespace ColombiaGo.Application.Mapping;
 
 public static class GuiaMappings
 {
-    public static GuiaDto ToDto(this Guia guia) => new(
+    public static GuiaDto ToDto(this Guia guia, string idioma = Idiomas.Espanol) => new(
         Id: guia.Id,
         Name: guia.Nombre,
         Specialty: guia.Especialidad,
@@ -15,7 +15,7 @@ public static class GuiaMappings
         Place: guia.Lugar,
         Rating: guia.CalificacionPromedio,
         Reviews: guia.TotalCalificaciones,
-        Price: DisplayFormatting.ToHourlyPriceLabel(guia.TarifaHora),
+        Price: DisplayFormatting.ToHourlyPriceLabel(guia.TarifaHora, idioma),
         Languages: guia.Idiomas,
         Image: guia.FotoUrl,
         Featured: guia.Destacado,

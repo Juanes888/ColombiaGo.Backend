@@ -39,6 +39,8 @@ public class ColombiaGoDbContext : DbContext
     public DbSet<Guia> Guias => Set<Guia>();
     public DbSet<Logro> Logros => Set<Logro>();
     public DbSet<UsuarioLogro> UsuarioLogros => Set<UsuarioLogro>();
+    public DbSet<LugarTraduccion> LugarTraducciones => Set<LugarTraduccion>();
+    public DbSet<GuiaViaje> GuiasViaje => Set<GuiaViaje>();
     public DbSet<UsuarioConfiguracion> UsuarioConfiguraciones => Set<UsuarioConfiguracion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

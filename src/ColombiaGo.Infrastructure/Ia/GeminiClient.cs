@@ -20,7 +20,7 @@ public sealed class GeminiClient : IGeminiClient
 
     public async Task<string?> GenerarJsonAsync(string prompt, CancellationToken ct = default)
     {
-        var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_options.Model}:generateContent?key={_options.ApiKey}";
+        var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_options.Model}:generateContent";
 
         var body = new GeminiRequest
         {
@@ -34,7 +34,10 @@ public sealed class GeminiClient : IGeminiClient
         HttpResponseMessage? response = null;
         for (var intento = 1; intento <= maxIntentos; intento++)
         {
-            response = await _http.PostAsJsonAsync(url, body, ct);
+            using var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = JsonContent.Create(body) };
+            // La clave va en el header (no en la URL) para que no quede en logs ni trazas.
+            request.Headers.Add("x-goog-api-key", _options.ApiKey);
+            response = await _http.SendAsync(request, ct);
             if (response.StatusCode != System.Net.HttpStatusCode.ServiceUnavailable || intento == maxIntentos)
                 break;
 

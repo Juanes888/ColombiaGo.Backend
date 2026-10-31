@@ -45,6 +45,7 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<IIdiomaActual, IdiomaActual>();
 
         services.Configure<ModeracionOptions>(configuration.GetSection(ModeracionOptions.SectionName));
         services.AddSingleton<IModeracionSettings, ModeracionSettings>();

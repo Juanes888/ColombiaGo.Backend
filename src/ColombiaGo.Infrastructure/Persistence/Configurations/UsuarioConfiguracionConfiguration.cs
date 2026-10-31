@@ -12,5 +12,6 @@ public class UsuarioConfiguracionConfiguration : IEntityTypeConfiguration<Usuari
 
         // Shares its PK with usuarios (one settings row per user) — never database-generated.
         builder.Property(x => x.Id).ValueGeneratedNever();
+        builder.Property(x => x.Idioma).HasMaxLength(5).IsRequired().HasDefaultValue("es");
     }
 }

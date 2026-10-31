@@ -34,6 +34,31 @@ public sealed class PerfilService : IPerfilService
         return Result<PerfilDto>.Success(usuario.ToPerfilDto(places, guides, reviews));
     }
 
+    public async Task<PreferenciasDto> GetPreferenciasAsync(CancellationToken ct = default)
+    {
+        var userId = _currentUser.RequireUserId();
+        var ids = (await _uow.UsuarioPreferencias.GetCategoriaIdsByUsuarioAsync(userId, ct)).ToHashSet();
+        var categorias = await _uow.Categorias.GetActivasAsync(ct);
+        return new PreferenciasDto(categorias.Where(c => ids.Contains(c.Id)).Select(c => c.Slug).ToList());
+    }
+
+    public async Task<Result<PreferenciasDto>> GuardarPreferenciasAsync(
+        GuardarPreferenciasRequest request, CancellationToken ct = default)
+    {
+        var userId = _currentUser.RequireUserId();
+        var slugs = request.Categorias.Distinct().ToList();
+
+        var categorias = await _uow.Categorias.GetActivasAsync(ct);
+        var ids = categorias.Where(c => slugs.Contains(c.Slug)).Select(c => c.Id).ToList();
+        if (ids.Count != slugs.Count)
+            return Result<PreferenciasDto>.Failure(Error.Validation(
+                "Perfil.CategoriaInvalida", "Alguna categoría no existe o no está activa."));
+
+        await _uow.UsuarioPreferencias.ReemplazarAsync(userId, ids, ct);
+        await _uow.SaveChangesAsync(ct);
+        return Result<PreferenciasDto>.Success(new PreferenciasDto(slugs));
+    }
+
     public async Task<IReadOnlyList<LogroDto>> GetLogrosAsync(CancellationToken ct = default)
     {
         var userId = _currentUser.RequireUserId();

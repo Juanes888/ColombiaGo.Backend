@@ -12,21 +12,24 @@ public sealed class FavoritoService : IFavoritoService
 {
     private readonly IUnitOfWork _uow;
     private readonly ICurrentUser _currentUser;
+    private readonly ILugarLocalizador _localizador;
 
-    public FavoritoService(IUnitOfWork uow, ICurrentUser currentUser)
+    public FavoritoService(IUnitOfWork uow, ICurrentUser currentUser, ILugarLocalizador localizador)
     {
         _uow = uow;
         _currentUser = currentUser;
+        _localizador = localizador;
     }
 
     public async Task<IReadOnlyList<LugarResumenDto>> GetLugaresFavoritosAsync(CancellationToken ct = default)
     {
         var userId = _currentUser.RequireUserId();
         var favoritos = await _uow.FavoritosLugares.GetByUsuarioAsync(userId, ct);
-        return favoritos
+        var lugares = favoritos
             .OrderByDescending(f => f.FechaAgregado)
-            .Select(f => f.Lugar.ToResumenDto())
+            .Select(f => f.Lugar)
             .ToList();
+        return await _localizador.ResumenAsync(lugares, ct);
     }
 
     public async Task<Result<FavoritoEstadoDto>> AgregarLugarAsync(string lugarSlug, CancellationToken ct = default)
