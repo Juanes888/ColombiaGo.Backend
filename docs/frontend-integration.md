@@ -85,6 +85,16 @@ Tras el login, `authHeader()` (arriba) ya adjunta el token a cada llamada autom�
 defecto de Vite). Si el front corre en otro puerto/dominio, agrégalo ahí (o vía la variable de
 entorno `Cors__AllowedOrigins__0`, etc., en producción).
 
+## 4b. Idioma, onboarding y guía de viaje con IA
+
+- **Idioma**: cada petición lleva `Accept-Language: es|en|pt|fr|zh` (`lib/api.ts` de `mobile/` lo agrega solo). Los
+  lugares, categorías y textos de la API vuelven en ese idioma. El idioma elegido también viaja en el registro
+  (`signUp(..., { options: { data: { idioma } } })`) y se guarda con `PUT /api/v1/perfil/configuracion` (`language`).
+- **Onboarding**: `GET /api/v1/perfil/configuracion` trae `onboardingCompleted`; las categorías de interés se guardan con
+  `PUT /api/v1/perfil/preferencias` y el tutorial se marca visto con `POST /api/v1/perfil/onboarding/completar`.
+- **Guía de viaje IA** (pestaña IA): `GET /api/v1/ia/ciudades` → `POST /api/v1/ia/guia-viaje` →
+  `GET /api/v1/ia/guias-viaje[/{id}]`. Detalle de cada forma en [`api-contract.md`](api-contract.md).
+
 ## 5. Qué falta del lado del front (fuera de este alcance)
 
 - UI para reseñas/calificaciones (el endpoint ya existe).

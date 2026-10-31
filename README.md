@@ -17,9 +17,12 @@ db/
   001_schema.sql              Tipos enum, tablas, índices, triggers
   002_seed.sql                Roles, categorías, logros, y los 18 lugares + 4 guías del mock del front
   003_rls.sql                 Políticas de Row Level Security (defensa para el acceso directo a Supabase)
+  004_i18n_onboarding_guias.sql  Idioma + onboarding por usuario, caché de traducciones, guías de viaje IA, más lugares de Medellín
+  005_hardening.sql           Permisos de funciones y extensión pg_trgm fuera del esquema público (avisos de seguridad de Supabase)
 docs/
   api-contract.md             Cada endpoint ↔ qué pantalla del front lo consume
   frontend-integration.md     Cómo reemplazar los mocks del front por llamadas reales
+  supabase-email-templates.md Plantillas de correo (código de 6 dígitos, 5 idiomas) y SMTP propio
 ```
 
 ## Requisitos
@@ -43,7 +46,13 @@ En el **SQL Editor de Supabase** (o vía `psql`), en este orden:
 # 2. Datos semilla (roles, categorías, lugares, guías)
 # 3. Row Level Security (opcional, recomendado si expones la API de datos de Supabase directamente)
 ```
-Pega el contenido de `db/001_schema.sql`, luego `db/002_seed.sql`, luego `db/003_rls.sql`.
+Pega el contenido de `db/001_schema.sql`, luego `002_seed.sql`, `003_rls.sql`, `004_i18n_onboarding_guias.sql`
+y `005_hardening.sql` (la 004 es necesaria para idiomas, onboarding y la guía de viaje con IA).
+
+### Correo con código de verificación
+
+Al registrarse, la app pide un código de 6 dígitos que Supabase manda por correo. Hay que cambiar las plantillas
+una vez en el dashboard: ver [`docs/supabase-email-templates.md`](docs/supabase-email-templates.md).
 
 ### Secretos (nunca en `appsettings.json`)
 
@@ -53,7 +62,17 @@ dotnet user-secrets set "ConnectionStrings:ColombiaGoDb" "Host=db.<project-ref>.
 dotnet user-secrets set "Supabase:Url" "https://<project-ref>.supabase.co"
 # Solo si tu proyecto usa el JWT secret legado (HS256) en vez de firma asimétrica:
 # dotnet user-secrets set "Supabase:JwtSecret" "<tu-jwt-secret>"
+
+# Gemini (Google AI Studio): traduce los lugares al idioma del usuario, arma la guía de viaje y la ruta con IA.
+# Sin esta clave la API funciona, pero esos tres endpoints responden con un error claro.
+dotnet user-secrets set "Gemini:ApiKey" "<tu-api-key>"
 ```
+
+### Idiomas
+
+La API lee `Accept-Language` (`es`, `en`, `pt`, `fr`, `zh`; por defecto `es`). El contenido de los lugares se traduce con
+Gemini la primera vez que se pide en ese idioma y queda guardado en `lugar_traducciones` (las siguientes peticiones no
+llaman a la IA). Para dejar todo traducido de antemano: `POST /api/v1/admin/traducciones/precalentar` (rol admin).
 
 ### Correr
 
