@@ -47,8 +47,8 @@ En el **SQL Editor de Supabase** (o vía `psql`), en este orden:
 # 2. Datos semilla (roles, categorías, lugares, guías)
 # 3. Row Level Security (opcional, recomendado si expones la API de datos de Supabase directamente)
 ```
-Pega el contenido de `db/001_schema.sql`, luego `002_seed.sql`, `003_rls.sql`, `004_i18n_onboarding_guias.sql`
-, `005_hardening.sql` y `006_logros_insignias.sql` (la 004 es necesaria para idiomas, onboarding y la guía de viaje con IA).
+Pega el contenido de `db/001_schema.sql`, luego `002_seed.sql`, `003_rls.sql`, `004_i18n_onboarding_guias.sql`,
+`005_hardening.sql` y `006_logros_insignias.sql` (la 004 es necesaria para idiomas, onboarding y la guía de viaje con IA).
 
 ### Correo con código de verificación
 
