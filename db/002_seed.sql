@@ -204,11 +204,11 @@ insert into guias (
     (null, 'Mateo', '/images/guia-mateo.jpg', 'Experto en Café', 'Café', 'yellow', 'Experto en Café',
      'Salento, Quindío', 70000, array['ES', 'EN'], true, true, 5.0, 128, now()),
 
-    (null, 'Sofía', '/images/guide-camila.jpg', 'Arte Urbana', 'Arte Urbano', 'purple', null,
-     'Medellín', 65000, array['ES', 'EN'], false, true, 4.9, 96, now()),
+    (null, 'Camila', '/images/guide-camila.jpg', 'Arte Urbana', 'Arte Urbana', 'purple', null,
+     'Medellín', 70000, array['ES', 'EN'], false, true, 4.9, 96, now()),
 
     (null, 'Andrés', '/images/guide-andres.jpg', 'Senderismo', 'Senderismo', 'green', null,
-     'Cocora, Quindío', 55000, array['ES'], false, true, 4.8, 74, now()),
+     'Cocora, Quindío', 60000, array['ES'], false, true, 4.8, 74, now()),
 
     (null, 'Lucía', '/images/guide-lucia.jpg', 'Cultura e Historia', 'Cultura & Historia', 'red', null,
      'Cartagena', 80000, array['ES', 'EN'], false, true, 4.9, 112, now())
