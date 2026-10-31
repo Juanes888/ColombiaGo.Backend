@@ -19,6 +19,7 @@ db/
   003_rls.sql                 Políticas de Row Level Security (defensa para el acceso directo a Supabase)
   004_i18n_onboarding_guias.sql  Idioma + onboarding por usuario, caché de traducciones, guías de viaje IA, más lugares de Medellín
   005_hardening.sql           Permisos de funciones y extensión pg_trgm fuera del esquema público (avisos de seguridad de Supabase)
+  006_logros_insignias.sql    10 logros con insignia + reglas reales de desbloqueo (función sincronizar_logros)
 docs/
   api-contract.md             Cada endpoint ↔ qué pantalla del front lo consume
   frontend-integration.md     Cómo reemplazar los mocks del front por llamadas reales
@@ -47,7 +48,7 @@ En el **SQL Editor de Supabase** (o vía `psql`), en este orden:
 # 3. Row Level Security (opcional, recomendado si expones la API de datos de Supabase directamente)
 ```
 Pega el contenido de `db/001_schema.sql`, luego `002_seed.sql`, `003_rls.sql`, `004_i18n_onboarding_guias.sql`
-y `005_hardening.sql` (la 004 es necesaria para idiomas, onboarding y la guía de viaje con IA).
+, `005_hardening.sql` y `006_logros_insignias.sql` (la 004 es necesaria para idiomas, onboarding y la guía de viaje con IA).
 
 ### Correo con código de verificación
 

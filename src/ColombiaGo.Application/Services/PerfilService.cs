@@ -63,6 +63,9 @@ public sealed class PerfilService : IPerfilService
     {
         var userId = _currentUser.RequireUserId();
 
+        // Antes de listar, se registran los logros que el usuario ya cumple (favoritos, guías, etc.).
+        await _uow.UsuarioLogros.SincronizarAsync(userId, ct);
+
         var todos = await _uow.Logros.GetAllAsync(ct);
         var desbloqueados = await _uow.UsuarioLogros.GetByUsuarioAsync(userId, ct);
         var desbloqueadosPorId = desbloqueados.ToDictionary(ul => ul.LogroId, ul => ul.FechaObtenido);
