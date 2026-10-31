@@ -69,7 +69,7 @@ insert into lugares (
      'Comuna 13: Arte y Transformación', 'comuna-13', 'Medellín', 'Antioquia',
      'Descubre la historia de resiliencia y el arte urbano más vibrante de Medellín. Graffiti, escaleras eléctricas y una comunidad que reescribió su destino.',
      'Arte, historia y transformación', 'Comuna 13, San Javier, Medellín, Antioquia',
-     6.076519, -75.647860, '8am - 6pm', 'Metro + Metrocable', '/images/comuna13.jpg',
+     6.256400, -75.612500, '8am - 6pm', 'Metro + Metrocable', '/images/comuna13.jpg',
      4.9, 2000, 'gratis', null, false, 'aprobado', now(), now()),
 
     ((select id from categorias where slug = 'nature'), null,
