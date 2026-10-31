@@ -23,6 +23,7 @@ db/
   007_guias_perfil.sql        Perfil completo de los guías: presentación en 5 idiomas, años de experiencia y tours
 docs/
   api-contract.md             Cada endpoint ↔ qué pantalla del front lo consume
+  deploy.md                   Cómo desplegar la API (Render/Docker) y conectar la app
   frontend-integration.md     Cómo reemplazar los mocks del front por llamadas reales
   supabase-email-templates.md Plantillas de correo (código de 6 dígitos, 5 idiomas) y SMTP propio
 ```

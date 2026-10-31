@@ -1,0 +1,19 @@
+# Blueprint de Render (https://render.com): "New + > Blueprint" y apuntar a este repositorio.
+# La región es Ohio porque tu proyecto de Supabase está en us-east-2 (también Ohio): así cada consulta a la base es más rápida.
+services:
+  - type: web
+    name: colombiago-api
+    runtime: docker
+    region: ohio
+    plan: free # el plan free se "duerme" tras 15 min sin uso (la 1.ª petición tarda ~30-60 s); "starter" (7 USD/mes) no se duerme
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Supabase__Url
+        value: https://ozbvwugphvmbbrwceyzo.supabase.co
+      - key: ConnectionStrings__ColombiaGoDb
+        sync: false # se pega en el panel de Render (Session pooler de Supabase, ver docs/deploy.md)
+      - key: Gemini__ApiKey
+        sync: false # se pega en el panel de Render
