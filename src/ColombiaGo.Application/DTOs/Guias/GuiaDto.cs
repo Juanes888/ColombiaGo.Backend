@@ -14,4 +14,8 @@ public sealed record GuiaDto(
     IReadOnlyList<string> Languages,
     string? Image,
     bool Featured,
-    string? Badge);
+    string? Badge,
+    bool Verified,
+    string? Bio,             // presentación en el idioma de la petición (cae a español si no hay traducción)
+    int ExperienceYears,
+    int ToursCount);

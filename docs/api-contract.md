@@ -22,6 +22,8 @@ detail, instance }`.
 | GET | `/lugares` | — | Búsqueda paginada. Query: `q, categoria, ciudad, region, rangoPrecio, page, pageSize`. Backing de `ExplorePage` y de "Imperdibles de Medellín" en `HomePage` (`?ciudad=medellin&pageSize=4`). |
 | GET | `/lugares/destacados?take=5` | — | Lugares con `destacado=true`. Backing del carrusel `FEATURED` de `HomePage`. |
 | GET | `/lugares/{slug}` | — | Detalle completo. `{slug}` es el mismo `id` que usa `Destination` en el front. 404 si no existe o no está `aprobado`. |
+| GET | `/lugares/{slug}/contenido` | — | El mismo detalle pero igual para todas las personas (`isFavorite/isInRoute` siempre `false`) y **guardado en caché 5 min** en el servidor: es el que usa la app. |
+| POST | `/lugares/{slug}/vista` | 🔒 | Registra que la persona abrió el detalle (alimenta las recomendaciones). 204. |
 | GET | `/lugares/{slug}/calificaciones?page&pageSize` | — | Reseñas **aprobadas** de un lugar. |
 | POST | `/lugares/{slug}/calificaciones` | 🔒 | Crea una reseña. Body: `{ puntuacion: 1-5, comentario? }`. 409 si el usuario ya calificó ese lugar. |
 
@@ -53,7 +55,7 @@ follow-up natural, no incluido en este alcance.
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
 | GET | `/guias?especialidad&ciudad` | — | Backing de `GuidesPage`. Solo guías `verificado=true`. |
-| GET | `/guias/{id}` | — | Detalle de un guía. |
+| GET | `/guias/{id}` | — | Detalle de un guía. Incluye `verified`, `bio` (en el idioma de `Accept-Language`), `experienceYears` y `toursCount`. |
 
 **Nota:** un `Guia` es una ficha de directorio, no necesariamente ligada a una cuenta real de
 Supabase (`UsuarioId` es nullable) — así se pueden sembrar los 4 guías demo del mock del front
@@ -186,3 +188,10 @@ Respuesta (resumida):
   "costoTotalEstimado": 420000, "presupuestoRestante": 380000, "excedePresupuesto": false,
   "consejosGenerales": ["…"], "queLlevar": ["…"] }
 ```
+
+
+## Caché y rendimiento
+
+- **Caché de salida (5 min)** en `GET /lugares`, `/lugares/destacados`, `/lugares/{slug}/contenido`, `/guias` y `/guias/{id}`: la clave incluye la query y `Accept-Language`. No dependen de la persona, así que se comparte entre todas.
+- Al arrancar, el backend calienta la conexión a la base y traduce a en/pt/fr/zh los lugares que falten (si hay `Gemini:ApiKey`), así nadie espera esa traducción en su primera visita.
+- En desarrollo el CORS acepta cualquier origen (el front web de Expo cambia de puerto); en producción solo `Cors:AllowedOrigins`.

@@ -20,6 +20,7 @@ public class GuiaConfiguration : IEntityTypeConfiguration<Guia>
         builder.Property(x => x.TarifaHora).HasPrecision(12, 2);
         builder.Property(x => x.CalificacionPromedio).HasPrecision(3, 2);
         builder.Property(x => x.Idiomas).HasColumnType("text[]");
+        builder.Property(x => x.DescripcionI18n).HasColumnType("jsonb").HasDefaultValueSql("'{}'::jsonb");
 
         // Filtered unique index: many guides can have UsuarioId = null (unlinked directory
         // entries), but a real user account can only back one guide profile.

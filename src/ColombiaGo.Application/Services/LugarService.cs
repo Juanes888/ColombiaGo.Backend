@@ -34,6 +34,25 @@ public sealed class LugarService : ILugarService
         return await _localizador.ResumenAsync(lugares.ToList(), ct);
     }
 
+    public async Task<Result<LugarDetalleDto>> GetContenidoAsync(string slug, CancellationToken ct = default)
+    {
+        var lugar = await _uow.Lugares.GetBySlugWithDetailsAsync(slug, ct);
+        if (lugar is null || lugar.EstadoPublicacion != EstadoPublicacion.Aprobado)
+            return Result<LugarDetalleDto>.Failure(Error.NotFound("Lugar.NotFound", $"No existe un lugar con id '{slug}'."));
+
+        return Result<LugarDetalleDto>.Success(await _localizador.DetalleAsync(lugar, false, false, ct));
+    }
+
+    public async Task<Result> RegistrarVistaAsync(string slug, CancellationToken ct = default)
+    {
+        var lugar = await _uow.Lugares.GetBySlugAsync(slug, ct);
+        if (lugar is null || lugar.EstadoPublicacion != EstadoPublicacion.Aprobado)
+            return Result.Failure(Error.NotFound("Lugar.NotFound", $"No existe un lugar con id '{slug}'."));
+
+        await RegistrarVistaAsync(_currentUser.RequireUserId(), lugar.Id, ct);
+        return Result.Success();
+    }
+
     public async Task<Result<LugarDetalleDto>> GetPorSlugAsync(string slug, CancellationToken ct = default)
     {
         var lugar = await _uow.Lugares.GetBySlugWithDetailsAsync(slug, ct);

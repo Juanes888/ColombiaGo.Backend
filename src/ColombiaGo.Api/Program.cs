@@ -27,6 +27,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddFrontendCors(builder.Configuration, builder.Environment);
+builder.Services.AddCatalogCaching();
+builder.Services.AddHostedService<DatabaseWarmup>();
 builder.Services.AddApiHealthChecks(builder.Configuration);
 
 var app = builder.Build();
@@ -45,6 +47,7 @@ app.UseCors(CorsExtensions.FrontendPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseOutputCache();
 
 app.MapControllers();
 app.MapHealthChecks("/health");

@@ -32,6 +32,15 @@ public class Guia : Entity<int>
     public bool Destacado { get; set; }
     public bool Verificado { get; set; }
 
+    /// <summary>Presentación del guía en español (idioma base).</summary>
+    public string? Descripcion { get; set; }
+
+    /// <summary>Presentación en los demás idiomas, como JSON <c>{"en": "...", "pt": "...", "fr": "...", "zh": "..."}</c>.</summary>
+    public string DescripcionI18n { get; set; } = "{}";
+
+    public int ExperienciaAnios { get; set; }
+    public int ToursRealizados { get; set; }
+
     public decimal CalificacionPromedio { get; set; }
     public int TotalCalificaciones { get; set; }
 

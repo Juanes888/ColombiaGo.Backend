@@ -6,6 +6,7 @@ using ColombiaGo.Domain.Enums;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace ColombiaGo.Api.Controllers;
 
@@ -27,6 +28,7 @@ public class LugaresController : ControllerBase
 
     /// <summary>Backs the Explore screen's search + category chips + city deep link.</summary>
     [HttpGet]
+    [OutputCache(PolicyName = CachingExtensions.CatalogPolicy)]
     public async Task<ActionResult<PagedResult<Application.DTOs.Lugares.LugarResumenDto>>> Buscar(
         [FromQuery] string? q,
         [FromQuery] string? categoria,
@@ -53,6 +55,7 @@ public class LugaresController : ControllerBase
 
     /// <summary>Backs the Home screen's featured carousel.</summary>
     [HttpGet("destacados")]
+    [OutputCache(PolicyName = CachingExtensions.CatalogPolicy)]
     public async Task<ActionResult<IReadOnlyList<Application.DTOs.Lugares.LugarResumenDto>>> Destacados(
         [FromQuery] int take = 5, CancellationToken ct = default) =>
         Ok(await _lugares.GetDestacadosAsync(take, ct));
@@ -65,6 +68,22 @@ public class LugaresController : ControllerBase
         var result = await _lugares.GetPorSlugAsync(slug, ct);
         return this.ToActionResult(result);
     }
+
+    /// <summary>
+    /// Mismo detalle que <c>GET {slug}</c> pero igual para todas las personas (sin favorito / en ruta, sin registrar la vista),
+    /// por eso se guarda en caché. La app ya sabe qué lugares son favoritos y avisa la vista aparte con <c>POST {slug}/vista</c>.
+    /// </summary>
+    [HttpGet("{slug}/contenido")]
+    [OutputCache(PolicyName = CachingExtensions.CatalogPolicy)]
+    public async Task<ActionResult<Application.DTOs.Lugares.LugarDetalleDto>> GetContenido(
+        string slug, CancellationToken ct) =>
+        this.ToActionResult(await _lugares.GetContenidoAsync(slug, ct));
+
+    /// <summary>Registra que la persona abrió el detalle del lugar (historial para recomendaciones).</summary>
+    [HttpPost("{slug}/vista")]
+    [Authorize]
+    public async Task<ActionResult> RegistrarVista(string slug, CancellationToken ct) =>
+        this.ToActionResult(await _lugares.RegistrarVistaAsync(slug, ct));
 
     [HttpGet("{slug}/calificaciones")]
     public async Task<ActionResult<PagedResult<CalificacionDto>>> GetCalificaciones(
