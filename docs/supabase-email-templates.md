@@ -4,7 +4,7 @@ La app pide un **código de 6 dígitos** al registrarse y al recuperar la contra
 *enlace*; hay que cambiar las plantillas para que el correo traiga `{{ .Token }}` (el código). El MCP de Supabase no
 puede editar plantillas ni SMTP, así que se hace una sola vez en el dashboard:
 
-**Dashboard → Authentication → Email Templates** (proyecto `ColombiaGo`, ref `vduapcvypytdencxufse`).
+**Dashboard → Authentication → Email Templates** (proyecto `ColombiaGo`, ref `ozbvwugphvmbbrwceyzo`).
 
 La app guarda el idioma elegido en el registro (`user_metadata.idioma`: `es|en|pt|fr|zh`), por eso las plantillas usan
 `{{ .Data.idioma }}` para escribir el correo en ese idioma. Si no viene, se usa español.

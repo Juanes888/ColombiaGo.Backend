@@ -26,7 +26,7 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddSwaggerDocumentation();
-builder.Services.AddFrontendCors(builder.Configuration);
+builder.Services.AddFrontendCors(builder.Configuration, builder.Environment);
 builder.Services.AddApiHealthChecks(builder.Configuration);
 
 var app = builder.Build();
