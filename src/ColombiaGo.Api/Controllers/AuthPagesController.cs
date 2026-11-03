@@ -33,6 +33,7 @@ public class AuthPagesController : ControllerBase
             h1 { font-size: 24px; margin: 0 0 10px; }
             p { color: #4A6580; line-height: 1.5; margin: 0; }
             [data-l] { display: none; }
+            .btn { display: inline-block; margin-top: 22px; background: #FFD100; color: #003B7D; font-weight: 800; text-decoration: none; padding: 14px 26px; border-radius: 18px; }
           </style>
         </head>
         <body>
@@ -44,11 +45,15 @@ public class AuthPagesController : ControllerBase
             <div data-l="pt"><h1>Pronto!</h1><p>Seu e-mail foi verificado. Volte ao app ColombiaGO e entre na sua conta.</p></div>
             <div data-l="fr"><h1>C'est fait !</h1><p>Votre e-mail est vérifié. Revenez dans l'application ColombiaGO et connectez-vous.</p></div>
             <div data-l="zh"><h1>完成！</h1><p>您的邮箱已验证。请返回 ColombiaGO 应用并登录。</p></div>
+            <a class="btn" id="open" href="colombiago://">Abrir ColombiaGO</a>
           </div>
           <script>
             var l = (navigator.language || 'es').slice(0, 2).toLowerCase();
             var el = document.querySelector('[data-l="' + l + '"]') || document.querySelector('[data-l="es"]');
             el.style.display = 'block';
+            // Abre la app instalada (esquema colombiago://). En Expo Go no aplica: ahí basta con volver a la app.
+            var open = { en: 'Open ColombiaGO', pt: 'Abrir o ColombiaGO', fr: 'Ouvrir ColombiaGO', zh: '打开 ColombiaGO' };
+            if (open[l]) document.getElementById('open').textContent = open[l];
           </script>
         </body>
         </html>
