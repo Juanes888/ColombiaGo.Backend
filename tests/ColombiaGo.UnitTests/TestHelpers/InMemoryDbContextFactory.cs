@@ -12,10 +12,12 @@ namespace ColombiaGo.UnitTests.TestHelpers;
 /// </summary>
 public static class InMemoryDbContextFactory
 {
-    public static ColombiaGoDbContext Create()
+    /// <param name="databaseName">Pasar el mismo nombre a dos llamadas da dos contextos sobre la misma base: sirve para
+    /// simular, como en producción, una petición nueva que no tiene nada cargado en memoria.</param>
+    public static ColombiaGoDbContext Create(string? databaseName = null)
     {
         var options = new DbContextOptionsBuilder<ColombiaGoDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(databaseName ?? Guid.NewGuid().ToString())
             .EnableSensitiveDataLogging()
             .Options;
 

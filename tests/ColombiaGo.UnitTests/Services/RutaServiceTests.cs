@@ -27,6 +27,29 @@ public class RutaServiceTests
     }
 
     [Fact]
+    public async Task AgregarParadaAsync_PrimeraParadaEnUnaPeticionNueva_IncluyeLaCategoria()
+    {
+        // En producción cada petición usa un DbContext nuevo, sin la categoría del lugar en memoria. Antes la primera
+        // parada fallaba al armar la respuesta (Categoria = null) y la app desmarcaba el lugar.
+        var db = Guid.NewGuid().ToString();
+        Guid usuarioId;
+        using (var seed = InMemoryDbContextFactory.Create(db))
+        {
+            var usuario = seed.AddUsuario(seed.AddRol());
+            seed.AddLugar(seed.AddCategoria(), "comuna-13");
+            usuarioId = usuario.Id;
+        }
+
+        using var context = InMemoryDbContextFactory.Create(db);
+        var service = new RutaService(new UnitOfWork(context), new FakeCurrentUser(usuarioId), TestServices.Localizador(context));
+
+        var result = await service.AgregarParadaAsync("comuna-13");
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Paradas.Should().ContainSingle().Which.Category.Should().Be("culture");
+    }
+
+    [Fact]
     public async Task GetMisParadasAsync_NoDraftYet_ReturnsEmptyRutaWithoutCreatingARow()
     {
         using var context = InMemoryDbContextFactory.Create();

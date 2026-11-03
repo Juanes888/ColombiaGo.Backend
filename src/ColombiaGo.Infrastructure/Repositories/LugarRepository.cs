@@ -21,8 +21,10 @@ public class LugarRepository : Repository<Lugar, int>, ILugarRepository
             .Include(l => l.Atributos).ThenInclude(la => la.TipoAtributo)
             .FirstOrDefaultAsync(l => l.Slug == slug, ct);
 
+    // Con la categoría: quien recibe el lugar (p. ej. agregar una parada a la ruta) suele devolverlo como resumen, y el
+    // resumen necesita la categoría. Sin el Include llegaba null en una petición nueva y la respuesta fallaba.
     public Task<Lugar?> GetBySlugAsync(string slug, CancellationToken ct = default) =>
-        Set.FirstOrDefaultAsync(l => l.Slug == slug, ct);
+        Set.Include(l => l.Categoria).FirstOrDefaultAsync(l => l.Slug == slug, ct);
 
     public async Task<PagedResult<Lugar>> SearchAsync(LugarQueryParams query, CancellationToken ct = default)
     {
