@@ -25,6 +25,11 @@ Supabase solo lo acepta si esa URL está permitida:
 Esa página dice "¡Listo! Tu correo quedó verificado, vuelve a la app" en el idioma del teléfono. Con las plantillas de
 abajo el correo trae además el **código de 6 dígitos**, que es lo que la app pide.
 
+> **Importante:** Supabase solo deja editar las plantillas después de configurar un **SMTP propio**
+> (Authentication → Emails → SMTP Settings; por ejemplo Resend, gratis hasta 3.000 correos/mes). Mientras tanto se
+> envían las plantillas por defecto, que traen un **enlace** en vez del código. La app lo soporta: la persona toca el
+> enlace (que ahora abre `/auth/confirmado`, no localhost) y en la app presiona **"Ya confirmé con el enlace"**.
+
 ## 1. Confirm signup
 
 **Subject:** `ColombiaGO · Tu código / Your code / Seu código / Votre code / 验证码`
