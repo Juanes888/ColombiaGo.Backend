@@ -30,4 +30,7 @@ public class GuiaRepository : Repository<Guia, int>, IGuiaRepository
 
     public Task<Guia?> GetByUsuarioIdAsync(Guid usuarioId, CancellationToken ct = default) =>
         Set.FirstOrDefaultAsync(g => g.UsuarioId == usuarioId, ct);
+
+    public async Task<IReadOnlyList<Guia>> GetSinVerificarAsync(CancellationToken ct = default) =>
+        await Set.Where(g => !g.Verificado).OrderBy(g => g.FechaRegistro).ToListAsync(ct);
 }

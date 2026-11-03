@@ -11,4 +11,9 @@ public sealed record LugarPendienteDto(
     // Null for system/seed-provided places — see Lugar.RegistradoPor.
     string? RegistradoPorNombre,
     string? RegistradoPorEmail,
-    DateTimeOffset FechaRegistro);
+    DateTimeOffset FechaRegistro,
+    string Descripcion,
+    string Direccion,
+    string? ImagenUrl,
+    decimal Latitud,
+    decimal Longitud);

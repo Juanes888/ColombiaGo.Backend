@@ -1,4 +1,5 @@
 using ColombiaGo.Application.Abstractions;
+using ColombiaGo.Infrastructure.Geo;
 using ColombiaGo.Domain.Enums;
 using ColombiaGo.Infrastructure.Auth;
 using ColombiaGo.Infrastructure.Ia;
@@ -52,6 +53,12 @@ public static class DependencyInjection
 
         services.Configure<GeminiOptions>(configuration.GetSection(GeminiOptions.SectionName));
         services.AddHttpClient<IGeminiClient, GeminiClient>();
+        services.AddHttpClient<IGeocoder, NominatimGeocoder>(client =>
+        {
+            // Nominatim exige identificar la aplicación en el User-Agent.
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("ColombiaGO-API/1.0 (+https://colombiago-api.onrender.com)");
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
 
         services.AddScoped<UsuarioProvisioner>();
         services.AddScoped<IClaimsTransformation, RolClaimsTransformation>();
@@ -71,6 +78,9 @@ public static class DependencyInjection
 
             options.AddPolicy("RequireGuia", policy =>
                 policy.RequireClaim(CurrentUser.RolClaimType, "guia", "admin"));
+
+            options.AddPolicy("RequireNegocio", policy =>
+                policy.RequireClaim(CurrentUser.RolClaimType, "negocio", "admin"));
         });
 
         return services;

@@ -144,4 +144,11 @@ public class LugarRepository : Repository<Lugar, int>, ILugarRepository
             .Take(take)
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyList<Lugar>> GetByRegistradorAsync(Guid usuarioId, CancellationToken ct = default) =>
+        await Set
+            .Include(l => l.Categoria)
+            .Where(l => l.RegistradoPor == usuarioId)
+            .OrderByDescending(l => l.FechaActualizacion)
+            .ToListAsync(ct);
 }

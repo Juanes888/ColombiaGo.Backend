@@ -190,6 +190,28 @@ Respuesta (resumida):
 ```
 
 
+## Roles y paneles
+
+Tipos de cuenta: **turista** (por defecto), **guia**, **negocio** y **admin**. Al registrarse la app manda
+`user_metadata.tipo_cuenta` (turista | guia | negocio) y el trigger `handle_new_user` asigna ese rol. `admin` nunca
+se elige desde la app: se asigna en la base (`update usuarios set rol_id = (select id from roles where nombre = 'admin') where correo_electronico = '...'`).
+`GET /perfil` incluye `role`.
+
+| Método | Ruta | Rol | Descripción |
+|---|---|---|---|
+| GET | `/guias/mi-perfil` | guía | Perfil propio (404 si aún no existe). |
+| PUT | `/guias/mi-perfil` | guía | Crea o edita el perfil propio. Queda `verified=false` hasta que un admin lo verifica; solo los verificados salen en `GET /guias`. |
+| GET | `/negocio/lugares` | negocio | Lugares propios con su estado (`pendiente / aprobado / rechazado`) y motivo de rechazo. |
+| POST | `/negocio/lugares` | negocio | Publica un lugar. Si no trae `latitude/longitude` se ubica con la dirección (OpenStreetMap Nominatim). Queda `pendiente`. |
+| PUT | `/negocio/lugares/{id}` | negocio | Edita un lugar propio (403 si es de otro negocio); vuelve a `pendiente`. |
+| GET | `/admin/guias/pendientes` | admin | Guías sin verificar. |
+| PATCH | `/admin/guias/{id}/verificar` | admin | Body `{ verificado: bool }`. |
+
+Las fotos de guías y negocios se suben desde la app al bucket público `fotos` de Supabase Storage (cada cuenta solo
+escribe en su carpeta `<id del usuario>/`) y se guarda la URL pública.
+
+`GET /auth/confirmado` (sin `/api/v1`) es la página a la que vuelven los enlaces de los correos de Supabase.
+
 ## Caché y rendimiento
 
 - **Caché de salida (5 min)** en `GET /lugares`, `/lugares/destacados`, `/lugares/{slug}/contenido`, `/guias` y `/guias/{id}`: la clave incluye la query y `Accept-Language`. No dependen de la persona, así que se comparte entre todas.

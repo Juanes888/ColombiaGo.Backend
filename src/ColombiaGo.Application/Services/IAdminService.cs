@@ -1,5 +1,6 @@
 using ColombiaGo.Application.Common;
 using ColombiaGo.Application.DTOs.Admin;
+using ColombiaGo.Application.DTOs.Guias;
 using ColombiaGo.Domain.Common;
 
 namespace ColombiaGo.Application.Services;
@@ -15,4 +16,6 @@ public interface IAdminService
     Task<PagedResult<CalificacionPendienteDto>> GetCalificacionesPendientesAsync(int page, int pageSize, CancellationToken ct = default);
 
     Task<Result> ModerarCalificacionAsync(int calificacionId, ModerarCalificacionRequest request, CancellationToken ct = default);
+    Task<IReadOnlyList<GuiaDto>> GetGuiasSinVerificarAsync(CancellationToken ct = default);
+    Task<Result> VerificarGuiaAsync(int guiaId, VerificarGuiaRequest request, CancellationToken ct = default);
 }

@@ -33,4 +33,7 @@ public interface ILugarRepository : IRepository<Lugar, int>
         int take, IReadOnlyCollection<int>? categoriaIds, CancellationToken ct = default);
 
     Task<PagedResult<Lugar>> GetPendientesAsync(int page, int pageSize, CancellationToken ct = default);
+
+    /// <summary>Lugares que publicó una cuenta de negocio (cualquier estado), los más recientes primero.</summary>
+    Task<IReadOnlyList<Lugar>> GetByRegistradorAsync(Guid usuarioId, CancellationToken ct = default);
 }

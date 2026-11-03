@@ -11,4 +11,5 @@ public sealed record PerfilDto(
     string? Photo,
     int Places,
     int Guides,
-    int Reviews);
+    int Reviews,
+    string Role);          // turista | guia | negocio | admin

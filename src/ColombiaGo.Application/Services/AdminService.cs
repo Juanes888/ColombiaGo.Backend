@@ -1,6 +1,7 @@
 using ColombiaGo.Application.Abstractions;
 using ColombiaGo.Application.Common;
 using ColombiaGo.Application.DTOs.Admin;
+using ColombiaGo.Application.DTOs.Guias;
 using ColombiaGo.Application.Mapping;
 using ColombiaGo.Domain.Common;
 using ColombiaGo.Domain.Enums;
@@ -64,6 +65,24 @@ public sealed class AdminService : IAdminService
         _uow.Calificaciones.Update(calificacion);
         await _uow.SaveChangesAsync(ct);
 
+        return Result.Success();
+    }
+
+    public async Task<IReadOnlyList<GuiaDto>> GetGuiasSinVerificarAsync(CancellationToken ct = default)
+    {
+        var guias = await _uow.Guias.GetSinVerificarAsync(ct);
+        return guias.Select(g => g.ToDto()).ToList();
+    }
+
+    public async Task<Result> VerificarGuiaAsync(int guiaId, VerificarGuiaRequest request, CancellationToken ct = default)
+    {
+        var guia = await _uow.Guias.GetByIdAsync(guiaId, ct);
+        if (guia is null)
+            return Result.Failure(Error.NotFound("Guia.NotFound", $"No existe un guía con id '{guiaId}'."));
+
+        guia.Verificado = request.Verificado;
+        _uow.Guias.Update(guia);
+        await _uow.SaveChangesAsync(ct);
         return Result.Success();
     }
 }

@@ -1,6 +1,7 @@
 using ColombiaGo.Api.Extensions;
 using ColombiaGo.Application.Common;
 using ColombiaGo.Application.DTOs.Admin;
+using ColombiaGo.Application.DTOs.Guias;
 using ColombiaGo.Application.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -56,6 +57,15 @@ public class AdminController : ControllerBase
     public async Task<IActionResult> ModerarCalificacion(
         int id, [FromBody] ModerarCalificacionRequest request, CancellationToken ct) =>
         this.ToActionResult(await _admin.ModerarCalificacionAsync(id, request, ct));
+
+    /// <summary>Guías que crearon su perfil y esperan verificación (no salen en la app hasta verificarlos).</summary>
+    [HttpGet("guias/pendientes")]
+    public async Task<ActionResult<IReadOnlyList<GuiaDto>>> GetGuiasPendientes(CancellationToken ct) =>
+        Ok(await _admin.GetGuiasSinVerificarAsync(ct));
+
+    [HttpPatch("guias/{id:int}/verificar")]
+    public async Task<IActionResult> VerificarGuia(int id, [FromBody] VerificarGuiaRequest request, CancellationToken ct) =>
+        this.ToActionResult(await _admin.VerificarGuiaAsync(id, request, ct));
 
     /// <summary>Traduce con IA todos los lugares a los 4 idiomas no base y los deja en caché, para que la
     /// primera persona que cambie de idioma no espere la traducción.</summary>

@@ -9,6 +9,22 @@ puede editar plantillas ni SMTP, así que se hace una sola vez en el dashboard:
 La app guarda el idioma elegido en el registro (`user_metadata.idioma`: `es|en|pt|fr|zh`), por eso las plantillas usan
 `{{ .Data.idioma }}` para escribir el correo en ese idioma. Si no viene, se usa español.
 
+## 0. Que los enlaces no apunten a localhost (URL Configuration)
+
+Si el correo trae un enlace que abre `localhost`, es porque Supabase usa su **Site URL** por defecto
+(`http://localhost:3000`). La app ya pide que los enlaces vuelvan a la página `/auth/confirmado` del backend, pero
+Supabase solo lo acepta si esa URL está permitida:
+
+**Dashboard → Authentication → URL Configuration**
+
+| Campo | Valor |
+|---|---|
+| **Site URL** | `https://colombiago-api.onrender.com/auth/confirmado` |
+| **Redirect URLs** (Add URL) | `https://colombiago-api.onrender.com/auth/confirmado` |
+
+Esa página dice "¡Listo! Tu correo quedó verificado, vuelve a la app" en el idioma del teléfono. Con las plantillas de
+abajo el correo trae además el **código de 6 dígitos**, que es lo que la app pide.
+
 ## 1. Confirm signup
 
 **Subject:** `ColombiaGO · Tu código / Your code / Seu código / Votre code / 验证码`

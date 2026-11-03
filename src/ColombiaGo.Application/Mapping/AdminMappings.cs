@@ -13,7 +13,12 @@ public static class AdminMappings
         Ciudad: lugar.Ciudad,
         RegistradoPorNombre: lugar.UsuarioRegistrador?.NombreCompleto,
         RegistradoPorEmail: lugar.UsuarioRegistrador?.CorreoElectronico,
-        FechaRegistro: lugar.FechaRegistro);
+        FechaRegistro: lugar.FechaRegistro,
+        Descripcion: lugar.Descripcion,
+        Direccion: lugar.Direccion,
+        ImagenUrl: lugar.ImagenPortadaUrl,
+        Latitud: lugar.Latitud,
+        Longitud: lugar.Longitud);
 
     public static CalificacionPendienteDto ToPendienteDto(this Calificacion calificacion) => new(
         Id: calificacion.Id,

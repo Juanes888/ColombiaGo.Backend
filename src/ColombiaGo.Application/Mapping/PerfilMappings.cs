@@ -18,7 +18,8 @@ public static class PerfilMappings
             Photo: usuario.FotoPerfilUrl,
             Places: places,
             Guides: guides,
-            Reviews: reviews);
+            Reviews: reviews,
+            Role: usuario.Rol?.Nombre ?? "turista");
     }
 
     public static ConfiguracionDto ToDto(this UsuarioConfiguracion config) =>
