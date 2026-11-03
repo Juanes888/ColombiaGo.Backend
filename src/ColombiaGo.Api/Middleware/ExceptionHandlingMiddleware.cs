@@ -12,6 +12,8 @@ namespace ColombiaGo.Api.Middleware;
 /// </summary>
 public sealed partial class ExceptionHandlingMiddleware
 {
+    private const int StatusCodeClientClosedRequest = 499;
+
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
     private readonly IHostEnvironment _environment;
@@ -29,6 +31,11 @@ public sealed partial class ExceptionHandlingMiddleware
         try
         {
             await _next(context);
+        }
+        catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+        {
+            // El cliente cerró la conexión (cambió de pantalla, recargó…): no es un fallo del servidor y nadie leerá la respuesta.
+            context.Response.StatusCode = StatusCodeClientClosedRequest;
         }
         catch (UnauthorizedAccessException ex)
         {

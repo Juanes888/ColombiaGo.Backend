@@ -49,7 +49,9 @@ public static class SupabaseAuthenticationExtensions
                 else
                 {
                     // Current default: asymmetric signing, public keys fetched from the JWKS.
-                    jwt.ConfigurationManager = new JwksConfigurationManager(supabase.JwksUri, new HttpClient());
+                    var jwks = new JwksConfigurationManager(supabase.JwksUri, new HttpClient());
+                    jwks.PreloadInBackground();
+                    jwt.ConfigurationManager = jwks;
                 }
             });
 

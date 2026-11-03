@@ -15,6 +15,7 @@ namespace ColombiaGo.Infrastructure.Auth;
 public sealed class JwksConfigurationManager : IConfigurationManager<OpenIdConnectConfiguration>, IDisposable
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(12);
+    private static readonly TimeSpan FetchTimeout = TimeSpan.FromSeconds(15);
 
     private readonly string _jwksUri;
     private readonly HttpClient _httpClient;
@@ -29,6 +30,16 @@ public sealed class JwksConfigurationManager : IConfigurationManager<OpenIdConne
         _httpClient = httpClient;
     }
 
+    /// <summary>
+    /// Baja las llaves en segundo plano al arrancar, así la primera petición con token no espera (ni se cae si el
+    /// cliente la cancela). Si falla, la primera petición lo reintenta.
+    /// </summary>
+    public void PreloadInBackground() => _ = Task.Run(async () =>
+    {
+        try { await GetConfigurationAsync(CancellationToken.None); }
+        catch (Exception) { /* se reintenta en la primera validación */ }
+    });
+
     public async Task<OpenIdConnectConfiguration> GetConfigurationAsync(CancellationToken cancel)
     {
         if (_cached is not null && DateTimeOffset.UtcNow - _cachedAt < CacheDuration)
@@ -40,7 +51,10 @@ public sealed class JwksConfigurationManager : IConfigurationManager<OpenIdConne
             if (_cached is not null && DateTimeOffset.UtcNow - _cachedAt < CacheDuration)
                 return _cached;
 
-            var json = await _httpClient.GetStringAsync(_jwksUri, cancel);
+            // La descarga no depende de la petición que la disparó: si esa petición se aborta, las llaves igual quedan
+            // guardadas para las siguientes. Tiene su propio tiempo máximo.
+            using var timeout = new CancellationTokenSource(FetchTimeout);
+            var json = await _httpClient.GetStringAsync(_jwksUri, timeout.Token);
             var jwks = new JsonWebKeySet(json);
 
             var configuration = new OpenIdConnectConfiguration();
