@@ -101,7 +101,7 @@ insert into lugares (
      4.6, 1200, 'moderado', null, false, 'aprobado', now(), now()),
 
     ((select id from categorias where slug = 'nature'), null,
-     'Guatapé', 'guatape', 'A 2h de Medellín', 'Antioquia',
+     'Guatapé', 'guatape', 'Guatapé', 'Antioquia',
      'El Peñol, zócalos de colores y una laguna que parece infinita. El paseo clásico desde Medellín para respirar montaña.',
      'Colores, paisajes y magia', 'Guatapé, Antioquia',
      6.232400, -75.159700, '6am - 6pm', 'Bus o tour', '/images/guatape.jpg',
